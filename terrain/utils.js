@@ -1,34 +1,3 @@
-function genTerrain(start, chunk, chunk_width, chunk_height) {
-    // chunk[start] = 1;
-    // let open = [];
-    // let closed = new Set();
-    // open.push(start);
-
-    // const dirs = [
-    //     {x: -1, y: 0},
-    //     {x: 1, y: 0},
-    //     {x: 0, y: 1},
-    //     {x: 0, y: -1},
-    // ];
-    // let steps = 0;
-    // while(open.length > 0) {
-    //     steps ++;
-    //     open.sort((a, b) => a - b);
-    //     let current = open.shift();
-    //     for(let d of dirs) {
-    //         const r = Math.random().toFixed(3);
-    //         const g = getDist(start, current, chunk_width);
-    //         if(r < 0 + g/3) {continue}
-    //         let n = getNeighbor(current, d.x, d.y, chunk_width, chunk_height);
-    //         if(n!==false && !closed.has(n) && !open.includes(n)) {
-    //             open.push(n);
-    //             chunk[n] = 1;
-    //         }
-    //     }
-    //     closed.add(current);
-    // }
-}
-
 //Returns the value at the tile, not the index in order for cross chunk neighbors
 function getNeighbor(start, dx, dy, index, world, world_width, world_height, chunk_width, chunk_height) {
     const p = getPos(start, chunk_width);  
@@ -96,6 +65,10 @@ function genCorners(world, world_width, world_height, chunk_width, chunk_height)
         }
     }
     return newWorld;
+}
+
+function noiseMap() {
+    
 }
 
 function getChunk(start, dx, dy, world, world_width, world_height) {
@@ -184,4 +157,4 @@ function getGlobalIndex(pos, world_width, world_height, chunk_width, chunk_heigh
     }
 }
 
-export { genTerrain , genHeights , genCorners, getNeighbor , convertTilePos , updateTile , getGlobalPos , getGlobalIndex};
+export { genHeights , genCorners, getNeighbor , convertTilePos , updateTile , getGlobalPos , getGlobalIndex};
