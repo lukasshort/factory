@@ -18,7 +18,7 @@ class World {
 
         this.layers             = [];
         for(let i = 0; i < _l; i++) {
-            this.layers.push(new NoiseLayer((this.cw)*Math.pow(2, i), 255*((i+1)/_l)));
+            this.layers.push(new NoiseLayer((3)*Math.pow(2, i), 255*((i+1)/_l)));
             this.layers[i].addNode(0, 0);
         }
 
