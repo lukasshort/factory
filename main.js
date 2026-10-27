@@ -1,40 +1,69 @@
-import { genTerrain } from "./terrain/utils.js";
-import { Tile } from "./Tile.js";
+// import { 
+//     genHeights , 
+//     getNeighborData , 
+//     getGlobalPos , 
+//     getGlobalIndex ,
+//     getData ,
+//     getIndex ,
+//     getRelativePos ,
+// } from "./terrain/utils.js";
+
+import { World , Chunk } from "./terrain/world.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-let mousex = 0;
-let mousey = 0;
-let hover = 0;
+let mouse = {
+    x: 0,
+    y: 0
+}
+let hover = {
+    x: 20,
+    y: 20,
+    z: 100
+};
 
-const tile_width = 50;
-const tile_gap = 5;
-const full_tile = tile_width + tile_gap;
+let panx = 0;
+let pany = 0;
+
+let panleft = false;
+let panright = false;
+let panup = false;
+let pandown = false;
+
+let zoomin = false;
+let zoomout = false;
+
+let rotate = false;
+
+let r = 0;
+
+let zoom = 2;
+
+const TILE_WIDTH = 35;
+const TILE_HEIGHT = 15;
 
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
 document.addEventListener("keypress", keyPressHandler);
 document.addEventListener("mousemove", (e) => {
     const rect = canvas.getBoundingClientRect();
-    mousex = e.clientX - rect.left;
-    mousey = e.clientY - rect.top;
-    let hx = (mousex - mousex % full_tile)
-    let hy = (mousey - mousey % full_tile);
-    if(mousex >= 0 && mousey >= 0                                                   //Not too far up and left
-    && mousex < world_width*tile_width && mousey < world_height*(tile_width+tile_gap)          //Not too far down and right
-    && mousex < hx + tile_width && mousey < hy + tile_width)                        //Not in the gaps
-        {hover = getIndex([hx/full_tile, hy/full_tile])}
-    else {hover = -1}
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
 });
 document.addEventListener("mousedown", () => {
-    if(hover >= 0) {genTerrain(hover, world, world_width, world_height);}
-})
+    //let gIndex = getGlobalIndex({x:Math.floor(hover.x), y:Math.floor(hover.y)}, world);
+    //updateTile(hover.z + 30, gIndex.i, world.chunks[gIndex.c], world);
+});
 
-const world_width = 10;
-const world_height = 10;
-let world = new Uint8Array(world_width * world_height);
-for(let i = 0; i < world_width*world_height; i++) {world[i] = 0}
+const chunk_width = 6;
+const chunk_height = 6;
+
+const world_width = 4;
+const world_height = 4;
+
+//Initialize chunk
+let world = new World(ctx, world_width, world_height, chunk_width, chunk_height, 4);
 
 //last time
 let lt = window.performance.now();
@@ -49,39 +78,84 @@ function step(timestamp) {
 }
 
 function draw(dt) {
-    renderTerrain();
-}
-
-function getPos(i) {
-    return [i % world_width,(i - i % world_width)/world_height];
-}
-
-function getIndex([x, y]) {
-    return x + y * world_width;
-}
-function renderTerrain() {
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-    for(let i = 0; i < world_width*world_height; i++) {
-        
-        let v = world[i];
-        let p = getPos(i);
-        let x = p[0]*full_tile;
-        let y = p[1]*full_tile;
-        if(v === 0) {
-            ctx.fillStyle = "rgb(240, 240, 240)";
-        } else if(v === 1) {ctx.fillStyle = "green"}
-        if(hover == i) {ctx.fillStyle = "rgba(146, 36, 36, 0.5)"}
-        ctx.fillRect(x, y, tile_width, tile_width);
-    }
+    world.renderTerrain(panx, pany, TILE_WIDTH, TILE_HEIGHT, zoom, canvas, r);
+    update();
 }
+
+function update() {
+    // let nx = (mouse.x - panx*2 - canvas.clientWidth/2)/TILE_WIDTH;
+    // let ny = (mouse.y - pany*2 +20)/tile_height;
+    // hover.x = nx + ny;
+    // hover.y = ny - nx;
+    // if(hover.x < 0) {hover.x = 0}
+    // if(hover.y < 0) {hover.y = 0}
+    // if(hover.x > (world.width)*world.chunk_width-1) {hover.x = (world.width)*world.chunk_width-1}
+    // if(hover.y > (world.height)*world.chunk_height-1) {hover.y = (world.height)*world.chunk_height-1}
+    // const gIndex = getGlobalIndex({x:Math.floor(hover.x),y:Math.floor(hover.y)}, world);
+    // if(gIndex !== undefined){hover.z = world.chunks[gIndex.c].h1[gIndex.i]};
+
+    if(panleft) {panx -= 2}
+    if(panright) {panx += 2}
+    if(panup) {pany -= 1}
+    if(pandown) {pany += 1}
+
+    if(rotate) {r += 1}
+
+    if(zoomin) {zoom -= 0.05}
+    if(zoomout) {zoom += 0.05}
+    
+}
+
+
 function keyDownHandler(e) {
     switch(e.key.toLowerCase()) {
-        
+        case "a":
+            panleft = true;
+            break;
+        case "d":
+            panright = true;
+            break;
+        case "w":
+            panup = true;
+            break;
+        case "s":
+            pandown = true;
+            break;
+        case "z":
+            rotate = true;
+            break;
+        case "q":
+            zoomin = true;
+            break;
+        case "e":
+            zoomout = true;
+            break;
     }
 }
 function keyUpHandler(e) {
     switch(e.key.toLowerCase()) {
-        
+        case "a":
+            panleft = false;
+            break;
+        case "d":
+            panright = false;
+            break;
+        case "w":
+            panup = false;
+            break;
+        case "s":
+            pandown = false;
+            break;
+        case "z":
+            rotate = false;
+            break;
+        case "q":
+            zoomin = false;
+            break;
+        case "e":
+            zoomout = false;
+            break;
     }
 }
 function keyPressHandler(e) {
@@ -91,5 +165,4 @@ function keyPressHandler(e) {
     }
 }
 
-//genTerrain();
 requestAnimationFrame(step);
