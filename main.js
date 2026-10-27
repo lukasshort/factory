@@ -31,6 +31,9 @@ let panright = false;
 let panup = false;
 let pandown = false;
 
+let zoomin = false;
+let zoomout = false;
+
 let rotate = false;
 
 let r = 0;
@@ -53,14 +56,14 @@ document.addEventListener("mousedown", () => {
     //updateTile(hover.z + 30, gIndex.i, world.chunks[gIndex.c], world);
 });
 
-const chunk_width = 3;
-const chunk_height = 3;
+const chunk_width = 6;
+const chunk_height = 6;
 
-const world_width = 2;
-const world_height = 2;
+const world_width = 4;
+const world_height = 4;
 
 //Initialize chunk
-let world = new World(ctx, world_width, world_height, chunk_width, chunk_height, 1);
+let world = new World(ctx, world_width, world_height, chunk_width, chunk_height, 4);
 
 //last time
 let lt = window.performance.now();
@@ -98,6 +101,9 @@ function update() {
     if(pandown) {pany += 1}
 
     if(rotate) {r += 1}
+
+    if(zoomin) {zoom -= 0.05}
+    if(zoomout) {zoom += 0.05}
     
 }
 
@@ -116,8 +122,14 @@ function keyDownHandler(e) {
         case "s":
             pandown = true;
             break;
-        case "e":
+        case "z":
             rotate = true;
+            break;
+        case "q":
+            zoomin = true;
+            break;
+        case "e":
+            zoomout = true;
             break;
     }
 }
@@ -135,8 +147,14 @@ function keyUpHandler(e) {
         case "s":
             pandown = false;
             break;
-        case "e":
+        case "z":
             rotate = false;
+            break;
+        case "q":
+            zoomin = false;
+            break;
+        case "e":
+            zoomout = false;
             break;
     }
 }

@@ -18,7 +18,7 @@ class World {
 
         this.layers             = [];
         for(let i = 0; i < _l; i++) {
-            this.layers.push(new NoiseLayer((i+1)*(this.cw), 255*((i+1)/_l)));
+            this.layers.push(new NoiseLayer((this.cw)*Math.pow(2, i), 255*((i+1)/_l)));
             this.layers[i].addNode(0, 0);
         }
 
@@ -29,7 +29,7 @@ class World {
             this.addChunk(p.x, p.y);
         }
         console.log(this.chunks);
-        this.debugCols          = ["blue", "green", "red", "yellow", "orange", "purple"];
+        this.debugCols          = ["green", "blue", "red", "yellow", "orange", "purple"];
     }
 
     addChunk(x, y) {
@@ -60,7 +60,7 @@ class World {
         const ry = ((n.x-dx) * Math.sin(theta)) + ((n.y-dy) * Math.cos(theta));
         if(n === false) {return false}
         let x = (o.x + panx) + (canvas.clientWidth/2) + (rx * tile_width)  - (ry * tile_width); // + (n.c.x * tile_width * n.c.w);
-        let y = (o.y + pany) + (200)                  + (ry * tile_height) + (rx * tile_height) - (n.h1* 0.1); // + (n.c.y * tile_height * n.c.h); 
+        let y = (o.y + pany) + (300)                  + (ry * tile_height) + (rx * tile_height) - (n.h1* 0.1); // + (n.c.y * tile_height * n.c.h); 
         return {x: x, y: y, h1: n.h1}   
     }   
     
@@ -128,8 +128,8 @@ class World {
                 // if(node.x <= 0) {node_a.x -= 0.5} else {node_a.x += 0.5}
                 // if(node.y <= 0) {node_a.y -= 0.5} else {node_a.y += 0.5}
                 
-                const node_w = node.f*2;
-                const color = this.debugCols[1];
+                const node_w = node.f*1.3 + 2;
+                const color = this.debugCols[l];
                 
                 let t = this.getRenderPos(node_a, panx, pany, z_tile_width, z_tile_height, canvas, origin, r);
                 
