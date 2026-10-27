@@ -1,12 +1,12 @@
-import { 
-    genHeights , 
-    getNeighborData , 
-    getGlobalPos , 
-    getGlobalIndex ,
-    getData ,
-    getIndex ,
-    getRelativePos ,
-} from "./terrain/utils.js";
+// import { 
+//     genHeights , 
+//     getNeighborData , 
+//     getGlobalPos , 
+//     getGlobalIndex ,
+//     getData ,
+//     getIndex ,
+//     getRelativePos ,
+// } from "./terrain/utils.js";
 
 import { World , Chunk } from "./terrain/world.js";
 
@@ -25,7 +25,6 @@ let hover = {
 
 let panx = 0;
 let pany = 0;
-//let zoom = 1;
 
 let panleft = false;
 let panright = false;
@@ -50,7 +49,7 @@ document.addEventListener("mousemove", (e) => {
     mouse.y = e.clientY - rect.top;
 });
 document.addEventListener("mousedown", () => {
-    let gIndex = getGlobalIndex({x:Math.floor(hover.x), y:Math.floor(hover.y)}, world);
+    //let gIndex = getGlobalIndex({x:Math.floor(hover.x), y:Math.floor(hover.y)}, world);
     //updateTile(hover.z + 30, gIndex.i, world.chunks[gIndex.c], world);
 });
 
@@ -61,7 +60,7 @@ const world_width = 2;
 const world_height = 2;
 
 //Initialize chunk
-let world = new World(ctx, world_width, world_height, chunk_width, chunk_height);
+let world = new World(ctx, world_width, world_height, chunk_width, chunk_height, 1);
 
 //last time
 let lt = window.performance.now();

@@ -7,6 +7,10 @@ function getChunkKey(x, y) {
     return `C${x}_${y}`;
 }
 
+function getNodeKey(x, y) {
+    return `N${x}_${y}`;
+}
+
 function getData(i, c, world) {
     //const pos = getPos(c, world.width);
     const src = world.chunks[c];
@@ -85,6 +89,7 @@ function getGlobalIndex(pos, world) {
 export { 
     getNeighborData ,
     getChunkKey ,
+    getNodeKey ,
     genHeights , 
     getGlobalPos , 
     getGlobalIndex , 
