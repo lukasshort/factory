@@ -38,7 +38,7 @@ let rotate = false;
 
 let r = 0;
 
-let zoom = 2;
+let zoom = 0.4;
 
 const TILE_WIDTH = 35;
 const TILE_HEIGHT = 15;
@@ -59,8 +59,8 @@ document.addEventListener("mousedown", () => {
 const chunk_width = 6;
 const chunk_height = 6;
 
-const world_width = 4;
-const world_height = 4;
+const world_width = 8;
+const world_height = 8;
 
 //Initialize chunk
 let world = new World(ctx, world_width, world_height, chunk_width, chunk_height, 4);

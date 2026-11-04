@@ -5,6 +5,7 @@ import {
     getIndex , 
     getRelativePos ,
     getNeighborData ,
+    getDist
 } from "./utils.js";
 
 class World {
@@ -18,7 +19,7 @@ class World {
 
         this.layers             = [];
         for(let i = 0; i < _l; i++) {
-            this.layers.push(new NoiseLayer((3)*Math.pow(2, i), 255*((i+1)/_l)));
+            this.layers.push(new NoiseLayer((3)*Math.pow(2, i), 128*((i+1)/_l)));
             this.layers[i].addNode(0, 0);
         }
 
@@ -54,13 +55,13 @@ class World {
     getRenderPos(n, panx, pany, tile_width, tile_height, canvas, o, r) {
         //console.log(tile_width, tile_height)
         const theta = r/100;
-        const dx = 2.5;
-        const dy = 2.5;
+        const dx = this.w * this.cw * 0.5;
+        const dy = this.h * this.ch * 0.5;
         const rx = ((n.x-dx) * Math.cos(theta)) - ((n.y-dy) * Math.sin(theta));
         const ry = ((n.x-dx) * Math.sin(theta)) + ((n.y-dy) * Math.cos(theta));
         if(n === false) {return false}
         let x = (o.x + panx) + (canvas.clientWidth/2) + (rx * tile_width)  - (ry * tile_width); // + (n.c.x * tile_width * n.c.w);
-        let y = (o.y + pany) + (300)                  + (ry * tile_height) + (rx * tile_height) - (n.h1* 0.1); // + (n.c.y * tile_height * n.c.h); 
+        let y = (o.y + pany) + (700)                  + (ry * tile_height) + (rx * tile_height) - (n.h1*2); // + (n.c.y * tile_height * n.c.h); 
         return {x: x, y: y, h1: n.h1}   
     }   
     
@@ -119,24 +120,24 @@ class World {
             }
         }
 
-        for(let l = 0; l < this.layers.length; l++) {
-            for(let n = this.layers[l].nodes.length - 1; n >= 0; n--) {
-                //console.log(l, n);
-                const node = this.layers[l].nodes[n];
+        // for(let l = 0; l < this.layers.length; l++) {
+        //     for(let n = this.layers[l].nodes.length - 1; n >= 0; n--) {
+        //         //console.log(l, n);
+        //         const node = this.layers[l].nodes[n];
                 
-                const node_a = {x: node.x-0.5, y: node.y-0.5, h1: node.h1}
-                // if(node.x <= 0) {node_a.x -= 0.5} else {node_a.x += 0.5}
-                // if(node.y <= 0) {node_a.y -= 0.5} else {node_a.y += 0.5}
+        //         const node_a = {x: node.x-0.5, y: node.y-0.5, h1: node.h1}
+        //         // if(node.x <= 0) {node_a.x -= 0.5} else {node_a.x += 0.5}
+        //         // if(node.y <= 0) {node_a.y -= 0.5} else {node_a.y += 0.5}
                 
-                const node_w = node.f*1.3 + 2;
-                const color = this.debugCols[l];
+        //         const node_w = node.f*1.3 + 2;
+        //         const color = this.debugCols[l];
                 
-                let t = this.getRenderPos(node_a, panx, pany, z_tile_width, z_tile_height, canvas, origin, r);
+        //         let t = this.getRenderPos(node_a, panx, pany, z_tile_width, z_tile_height, canvas, origin, r);
                 
-                this.ctx.fillStyle = color;
-                this.ctx.fillRect(t.x - node_w/2, t.y - node_w/2, node_w, node_w);
-            }
-        }
+        //         this.ctx.fillStyle = color;
+        //         this.ctx.fillRect(t.x - node_w/2 + 5, t.y - node_w/2, node_w, t.h1);
+        //     }
+        // }
     }
     getCornersData(t) {
         let corners = [
@@ -153,7 +154,7 @@ class World {
                 y: t.y + 0.5,
                 i: t.i + 0.5, 
                 c: t.c, 
-                h1: trueCorners.reduce((a,b) => a += b.h1, t.h1)/(trueCorners.length)
+                h1: trueCorners.reduce((a,b) => a += b.h1, 0)/(trueCorners.length)
             });
         } else {corners.push(false)}
 
@@ -182,12 +183,64 @@ class Chunk {
             let p = getRelativePos(i, this.w);
             p.x += (this.x * this.w);
             p.y += (this.y * this.h);
-            console.log(_world);
+            console.log("a");
             for(let l = 0; l < _world.layers.length; l ++) {
                 const nodes = this.getLayerNodes(p.x, p.y, l+1, _world);
+                // let e01 = this.lerpPos(nodes[0].x, nodes[1].x, p.x);
+                // let e13 = this.lerpPos(nodes[1].y, nodes[3].y, p.y);
+                // let e23 = this.lerpPos(nodes[2].x, nodes[3].x, p.x);
+                // let e02 = this.lerpPos(nodes[0].y, nodes[2].y, p.y);
+                // e01 = this.lerpVal(e01, nodes[0], nodes[1]);
+                // e13 = this.lerpVal(e13, nodes[1], nodes[3]);
+                // e23 = this.lerpVal(e23, nodes[2], nodes[3]);
+                // e02 = this.lerpVal(e02, nodes[0], nodes[2]);
+                // this.h1[i] += (e01+e13+e23+e02)/4;
+                // console.log(this.h1[i]);
+                const top = this.lerpVal(
+                    this.lerpPos(nodes[0].x, nodes[1].x, p.x),
+                    nodes[0], nodes[1]
+                );
+
+                const bottom = this.lerpVal(
+                    this.lerpPos(nodes[2].x, nodes[3].x, p.x),
+                    nodes[2], nodes[3]
+                );
+
+                const result = this.lerpVal(
+                    this.lerpPos(nodes[0].y, nodes[2].y, p.y),
+                    {h1: top},
+                    {h1: bottom}
+                );
+
+                this.h1[i] += result;
+
+                //console.log(tx, ty);
             }
-            this.h1[i] = Math.round((Math.random() * 255))
+            //this.h1[i] = Math.round((Math.random() * 255))
         }
+    }
+
+    lerpPos(a, b, n) {
+        const len = b - a;
+        const rel = n - a;
+        const la = 1 - rel/len;
+        const lb = 1 - la;
+        return [la, lb];
+    }
+    lerpVal(rel, a, b) {
+        return (a.h1*rel[0] + b.h1*rel[1])/1;
+    }
+
+    
+
+    interpolate2D(h00, h10, h01, h11, tx, ty) {
+        tx = this.smooth(tx);
+        ty = this.smooth(ty);
+
+        const a = this.lerp(h00, h10, tx);
+        const b = this.lerp(h01, h11, tx);
+
+        return this.lerp(a, b, ty);
     }
 
     getNode(i) {
@@ -212,14 +265,12 @@ class Chunk {
             const nx = ox + ((layer.f)*dx);
             const ny = oy + ((layer.f)*dy);
             let node = layer.getNode(nx, ny);
-            console.log(node);
             if(node === undefined) {
                 node = new NoiseNode(nx, ny, layer.f, layer.a);
                 layer.nodes.push(node);
             }
             nodes.push(node);
         }
-        console.log(nodes);
         return nodes;
     }
 }

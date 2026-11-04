@@ -95,5 +95,6 @@ export {
     getGlobalIndex , 
     getData ,
     getIndex ,
-    getRelativePos 
+    getRelativePos ,
+    getDist
 };
